@@ -20,7 +20,19 @@ export default function Hero() {
         </FadeIn>
 
         {/* Headline + photo */}
-        <div className="flex items-center gap-8 md:gap-12 flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-8 md:gap-12 flex-1">
+          {/* Foto — mobil: nad textem, centrovaná */}
+          <div className="sm:hidden flex justify-center">
+            <Image
+              src="/images/martin-pour-circle.png"
+              alt="Martin Pour"
+              width={200}
+              height={200}
+              priority
+              className="w-44 h-44"
+            />
+          </div>
+
           <div className="flex-1 min-w-0">
             <FadeIn delay={0.08}>
               <h1
@@ -71,7 +83,7 @@ export default function Hero() {
             </FadeIn>
           </div>
 
-          {/* Circle photo — volně, bez boxu */}
+          {/* Foto — desktop: vedle textu */}
           <FadeIn delay={0.12} direction="left">
             <div className="shrink-0 hidden sm:block w-[200px] md:w-[300px] lg:w-[380px]">
               <Image
