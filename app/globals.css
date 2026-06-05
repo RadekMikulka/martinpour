@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Conthrax — nadpisy (stejný font jako Aberg Energy) */
+@font-face {
+  font-family: "Conthrax";
+  src: url("/fonts/Conthrax-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Conthrax";
+  src: url("/fonts/Conthrax-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Conthrax";
+  src: url("/fonts/Conthrax-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  /* Paleta shodná s Aberg Energy */
+  --color-primary: #2F455C;
+  --color-primary-light: #3D5A7A;
+  --color-accent: #1032CF;
+  --color-accent-light: #2A4EEF;
+  --color-cyan: #00E8F5;
+  --color-cyan-light: #E0FAFB;
+  --color-bg: #F9F9F9;
+  --color-surface: #FFFFFF;
+  --color-text: #141414;
+  --color-muted: #6B7280;
+  --color-border: #E2E2E2;
+
+  --font-sans: "Montserrat", system-ui, sans-serif;
+  --font-display: "Conthrax", "Montserrat", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #F9F9F9;
+  color: #141414;
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Conthrax na všechny nadpisy */
+h1, h2, h3 {
+  font-family: "Conthrax", "Montserrat", sans-serif;
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background-color: #00E8F5;
+  color: #141414;
 }
