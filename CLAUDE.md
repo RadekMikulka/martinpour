@@ -1,72 +1,83 @@
-# martinpour.cz — Projekt přehled
+# CLAUDE.md
 
-One-page web pro nezávislého energetického poradce Martina Poura.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Stack
-- Next.js 15 (App Router) + TypeScript
-- Tailwind CSS v4 (CSS-based config v `app/globals.css`)
-- Framer Motion (scroll animace přes `components/ui/FadeIn.tsx`)
-- Formspree (kontaktní formulář)
-- Google Analytics 4 + Consent Mode v2
+## Commands
 
-## Struktura
-```
-app/
-  layout.tsx        — Inter font, metadata, GA4
-  page.tsx          — sestavuje všechny sekce
-  globals.css       — Tailwind + design tokeny (@theme)
-  sitemap.ts        — SEO sitemap
-  robots.ts         — robots.txt
-components/
-  Header.tsx        — fixed navigace s mobile hamburgerem
-  Footer.tsx        — IČO, GDPR, copyright
-  Analytics.tsx     — GA4 + Consent Mode v2
-  sections/
-    Hero.tsx        — headline, CTA, Martinova fotka
-    Problem.tsx     — tmavý pruh s empatickým textem
-    Services.tsx    — 4 karty "Co pro vás udělám"
-    HowItWorks.tsx  — 3 kroky procesu
-    WhyMartin.tsx   — bullety + citát s fotkou
-    Pricing.tsx     — transparentní ceník
-    FAQ.tsx         — 6 otázek, accordion
-    Contact.tsx     — formulář + kontaktní info
-  ui/
-    FadeIn.tsx      — reusable scroll animation wrapper
-public/
-  images/
-    martin-pour-transparent.png  — hlavní foto (hero)
-    martin-pour-circle.png       — avatar (WhyMartin citát)
-    martin-pour-hero.jpg         — záložní foto
+```bash
+npm run dev      # dev server at localhost:3000
+npm run build    # production build (runs type-check)
+npm run start    # serve production build locally
 ```
 
-## Paleta
-| Token | Hex | Použití |
-|-------|-----|---------|
-| Primary | `#1E3A5F` | Nadpisy, navigace, akcenty |
-| Accent | `#F59E0B` | CTA tlačítka, ikony, zvýraznění |
-| Background | `#FAFAF7` | Stránkové pozadí |
-| Surface | `#FFFFFF` | Karty, formuláře |
-| Muted | `#6B7280` | Tělo textu, popisky |
-| Border | `#E5E5E0` | Orámování karet |
+No linter or test suite is configured. Type correctness is enforced by `next build`.
 
-## Tone of voice
-- Vykání, ale lidské. Ne "Vážený zákazníku".
-- Krátké věty. Aktivní slovesa.
-- Žádné superlativy, žádné korporátní fráze.
-- Konkrétní čísla a příklady.
-- Příklady: "Ukážu vám, kolik reálně platíte", "Bez podpisů na koleni"
+## Architecture
 
-## Proměnné prostředí
-Viz `.env.local.example` — před deploym je potřeba nastavit:
-- `NEXT_PUBLIC_SITE_URL` — produkční URL
-- `NEXT_PUBLIC_FORMSPREE_ID` — ID formuláře na formspree.io
-- `NEXT_PUBLIC_GA_ID` — Google Analytics Measurement ID (G-XXXXXXXXXX)
+Single-page marketing site for energy consultant Martin Pour. One route (`/`), fully static output.
 
-## Co je potřeba doplnit (TODO)
-- [ ] Opravit telefon a e-mail v `Contact.tsx`
-- [ ] Opravit LinkedIn URL v `Contact.tsx`
-- [ ] Doplnit IČO do `Footer.tsx`
-- [ ] Nastavit `.env.local` (Formspree ID, GA4 ID)
-- [ ] Vytvořit `public/og-image.png` (1200×630 px) pro sdílení na sítích
-- [ ] Vytvořit stránku `/gdpr` nebo přidat GDPR text jako modal
-- [ ] Zvážit cookie consent banner (propojit s `grantConsent()`/`denyConsent()` z `Analytics.tsx`)
+**Page composition** — `app/page.tsx` imports and renders sections in order:
+`Header → Hero → Problem → Services → HowItWorks → WhyMartin → Pricing → FAQ → Contact → Footer`
+
+To reorder, add, or remove a section, edit only `app/page.tsx`.
+
+**Section components** live in `components/sections/`. Each is self-contained — its own copy of all hardcoded colors and text. There is no shared data layer or CMS; copy changes happen directly in the component file.
+
+**Scroll animations** — wrap any element in `<FadeIn delay={n} direction="up|left|right|none">` from `components/ui/FadeIn.tsx`. It uses Framer Motion `useInView` with `once: true`, so animations fire once when the element enters the viewport. All section components are Client Components only when they need interactivity (FAQ accordion, Contact form, Header scroll state); otherwise they are Server Components.
+
+**Styling** — Tailwind CSS v4 with CSS-based configuration (no `tailwind.config.ts`). Design tokens are defined in `app/globals.css` inside `@theme {}`. All colors are hardcoded as hex literals in components (not as Tailwind utility aliases) because the v4 `@theme` tokens aren't reliably available as arbitrary-value classes across all contexts.
+
+**Fonts:**
+- `Conthrax` — display font for all `h1/h2/h3` (set globally in `globals.css`), loaded from `public/fonts/*.woff2`. Also applied inline via `style={{ fontFamily: "Conthrax, Montserrat, sans-serif" }}` on specific non-heading elements (stats, logo, step numbers).
+- `Montserrat` — body font, loaded via `next/font/google` in `app/layout.tsx`.
+
+**Analytics** — `components/Analytics.tsx` initialises GA4 with Consent Mode v2 defaults (`analytics_storage: denied`). Call `grantConsent()` / `denyConsent()` (exported from the same file) from a cookie banner to update consent. GA ID is read from `NEXT_PUBLIC_GA_ID`; the component renders nothing if the var is unset.
+
+**Contact form** — submits via Formspree (`https://formspree.io/f/${NEXT_PUBLIC_FORMSPREE_ID}`). No server route needed.
+
+## Brand & design rules
+
+Matches Aberg Energy visual identity (parent company).
+
+| Role | Value |
+|---|---|
+| Primary navy | `#2F455C` |
+| CTA blue | `#1032CF` / hover `#2A4EEF` |
+| Cyan accent | `#00E8F5` |
+| Background | `#F9F9F9` |
+| Muted text | `#64748B` |
+| Silver labels | `#94A3B8` |
+| Border | `#E2E2E2` |
+
+- Navigation links: `uppercase tracking-widest text-xs`
+- Section labels (overlines): `uppercase tracking-widest text-xs text-[#00E8F5]`
+- Primary CTA buttons: `border-2 border-[#00E8F5]` outline style, fills cyan on hover
+- Czech quotation marks: `„ ... "` (not `" ... "`)
+- No em dashes (`—`) in copy — use a period or comma instead
+
+**Tone of voice:** informal Czech, second-person plural (vykání). Short sentences. No superlatives, no corporate jargon. No em dashes.
+
+## Environment variables
+
+Copy `.env.local.example` to `.env.local`:
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Canonical URL (no trailing slash) |
+| `NEXT_PUBLIC_FORMSPREE_ID` | Formspree form ID |
+| `NEXT_PUBLIC_GA_ID` | GA4 Measurement ID (`G-…`) |
+
+## Remaining TODOs
+
+- LinkedIn URL in `Contact.tsx` (currently placeholder)
+- IČO in `Footer.tsx`
+- `public/og-image.png` — 1200×630 px for Open Graph
+- `/gdpr` page or modal (linked from footer and contact form)
+- Cookie consent banner wired to `grantConsent()` / `denyConsent()`
+- Formspree ID and GA4 ID set in Vercel environment variables
+
+## Deploy
+
+GitHub → Vercel auto-deploy on push to `main`.
+Repo: https://github.com/RadekMikulka/martinpour
+Live: https://martinpour.vercel.app
